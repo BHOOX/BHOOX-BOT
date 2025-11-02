@@ -1,0 +1,69 @@
+#!/data/data/com.termux/files/usr/bin/bash
+
+echo "[INFO] Instalando dependências..."
+pkg update -y && pkg upgrade -y
+pkg install git gh -y
+
+echo "[INFO] Verificando login no GitHub..."
+if ! gh auth status >/dev/null 2>&1; then
+  gh auth login
+else
+  echo "[INFO] Já autenticado no GitHub."
+fi
+
+# Caminho do projeto
+PROJETO_BASE="/sdcard/GITHUB"
+
+# Verifica se a pasta existe
+if [ ! -d "$PROJETO_BASE" ]; then
+  echo "[ERRO] A pasta $PROJETO_BASE não existe!"
+  exit 1
+fi
+
+cd "$PROJETO_BASE" || exit
+
+# Inicializa git se necessário
+if [ ! -d ".git" ]; then
+  echo "[INFO] Inicializando repositório Git..."
+  git init
+  echo "node_modules/" > .gitignore
+fi
+
+# Mostra repositórios do usuário autenticado
+echo ""
+echo "[INFO] Seus repositórios no GitHub:"
+gh repo list --limit 20
+echo ""
+read -p "👉 Digite o nome do repositório para enviar (ex: usuario/repositorio): " REPO
+
+# Verifica se existe repositório remoto
+if gh repo view "$REPO" >/dev/null 2>&1; then
+  echo "[INFO] Repositório encontrado no GitHub."
+else
+  echo "[INFO] Repositório não encontrado. Deseja criar? (s/n)"
+  read RESP
+  if [ "$RESP" = "s" ]; then
+    gh repo create "$REPO" --public
+  else
+    echo "[ERRO] Repositório não existe. Encerrando."
+    exit 1
+  fi
+fi
+
+# Adiciona repositório remoto
+git remote remove origin 2>/dev/null
+git remote add origin "https://github.com/$REPO.git"
+
+# Comita e envia
+git add .
+git commit -m "Upload automático via Termux"
+git branch -M main
+
+echo "[INFO] Enviando arquivos..."
+git push -u origin main
+
+if [ $? -eq 0 ]; then
+  echo "[OK] Upload concluído com sucesso no GitHub!"
+else
+  echo "[ERRO] Falha ao enviar. Verifique conexão ou permissões."
+fi

@@ -1,0 +1,38 @@
+
+Entre em contato comigo com o link abaixo:
+http://wa.me//+5546999250673
+
+
+
+           🩸COMANDOS DO TERMUX🩸
+
+
+
+
+//permitir que o termux acesse seus arquivos 
+
+termux-setup-storage
+
+/////////////////////////
+
+
+Apos pedir confirmação desses comandos digite y e depois de enter 
+
+
+pkg update
+
+pkg upgrade
+
+pkg install yarn
+
+pkg install nodejs
+
+pkg install git
+
+cd /sdcard/BHOOX-BOT-LITE
+
+npm start
+
+
+//créditos 
+by: DEV-VICTOR 
